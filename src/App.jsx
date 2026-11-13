@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Card, Form, Alert, Row, Col, Button, Table, Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 import { initializeApp } from 'firebase/app';
 import { 
@@ -148,6 +149,7 @@ const FeverPortal = () => {
   const [user, setUser] = useState(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
   const [authError, setAuthError] = useState(null);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
 
   const [temperature, setTemperature] = useState('');
   const [unit, setUnit] = useState('C');
@@ -156,6 +158,8 @@ const FeverPortal = () => {
 
   const [history, setHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
+
+  const RECAPTCHA_SITE_KEY = "6Lf9Ex4uAAAAAEZIOZoTepmOtll8-CYjq_JKHTFo";
 
   const isInAppBrowser = /FBAN|FBAV|Messenger|Instagram/i.test(navigator.userAgent);
 
@@ -167,12 +171,21 @@ const FeverPortal = () => {
         fetchUserHistory(currentUser.uid);
       } else {
         setHistory([]);
+        setCaptchaVerified(false);
       }
     });
     return () => unsubscribe();
   }, []);
 
+  const handleCaptchaChange = (token) => {
+    setCaptchaVerified(!!token);
+  };
+
   const handleGoogleLogin = async () => {
+    if (!captchaVerified) {
+      setAuthError("Please complete the reCAPTCHA verification box first.");
+      return;
+    }
     setAuthError(null);
     try {
       await signInWithPopup(auth, googleProvider);
@@ -187,6 +200,7 @@ const FeverPortal = () => {
     await signOut(auth);
     setUser(null);
     setHistory([]);
+    setCaptchaVerified(false);
   };
 
   const getTempInCelsius = () => {
@@ -316,8 +330,21 @@ const FeverPortal = () => {
                 </Alert>
               )}
 
+              <div className="d-flex justify-content-center mb-3">
+                <ReCAPTCHA
+                  sitekey={RECAPTCHA_SITE_KEY}
+                  onChange={handleCaptchaChange}
+                  onExpired={() => setCaptchaVerified(false)}
+                />
+              </div>
+
               <div className="d-grid gap-3 col-md-8 mx-auto">
-                <Button variant="danger" size="lg" onClick={handleGoogleLogin}>
+                <Button 
+                  variant="danger" 
+                  size="lg" 
+                  onClick={handleGoogleLogin}
+                  disabled={!captchaVerified}
+                >
                   Continue with Google
                 </Button>
               </div>
