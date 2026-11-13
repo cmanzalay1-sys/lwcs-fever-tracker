@@ -157,6 +157,8 @@ const FeverPortal = () => {
   const [history, setHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
 
+  const isInAppBrowser = /FBAN|FBAV|Messenger|Instagram/i.test(navigator.userAgent);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -302,6 +304,12 @@ const FeverPortal = () => {
 
               <h5 className="mb-4">Sign in with your Google account to view your private temperature log</h5>
               
+              {isInAppBrowser && (
+                <Alert variant="warning" className="text-start small mb-3">
+                  <strong>Opened in Messenger?</strong> Google Sign-In does not work inside Messenger's built-in browser. Please tap the <strong>⋮</strong> or <strong>⋯</strong> menu in the corner and select <strong>Open in Chrome / Browser</strong>.
+                </Alert>
+              )}
+
               {authError && (
                 <Alert variant="danger" className="text-start small user-select-all">
                   {authError}
