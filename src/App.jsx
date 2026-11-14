@@ -159,7 +159,7 @@ const FeverPortal = () => {
   const [history, setHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
 
-  const RECAPTCHA_SITE_KEY = "6Lf9Ex4uAAAAAEZIOZoTepmOtll8-CYjq_JKHTFo";
+  const RECAPTCHA_SITE_KEY = "6LeteR8uAAAAAOEW9V7jCSsW-GLwibGlufFQegbf";
 
   const isInAppBrowser = /FBAN|FBAV|Messenger|Instagram/i.test(navigator.userAgent);
 
